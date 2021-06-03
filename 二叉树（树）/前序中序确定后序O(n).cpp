@@ -23,8 +23,8 @@ void solve() {
 			cur2++;
 		}
 		tree[in[cur2 - 1]].right = pre[cur1 + 1];
+		vis[pre[cur1+1]] = 1;
 		cur1++;
-		vis[pre[cur1]] = 1;
 	}
 }
 void posterorder(int root)
