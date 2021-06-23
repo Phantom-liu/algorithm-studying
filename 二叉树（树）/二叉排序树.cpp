@@ -1,56 +1,83 @@
-ï»¿#include<bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
 struct BStree {
-	int value=0;
+	int value = 0;
 	BStree* leftc;
 	BStree* rightc;
-	BStree():leftc(NULL), rightc(NULL) {}
-	BStree(int a,BStree* left=NULL,BStree* right=NULL) {
+	BStree() :leftc(NULL), rightc(NULL) {}
+	BStree(int a, BStree* left = NULL, BStree* right = NULL) {
 		value = a;
 		leftc = left;
 		rightc = right;
 	}
 };
 BStree*root = new BStree();
-void insertBST(int value,BStree* &head) {
-	if (head == NULL)
-	{
-		head = new BStree(value);
+void insertBST(int value, BStree* head) {
+	if(head==NULL){
+		root=new BStree(value);
+		return; 
+	} 
+	BStree *p=NULL;
+	while (head != NULL&&value != head->value) {
+		p=head;
+		if (value > head->value) {
+			head = head->rightc;
+		}
+		else {
+			head = head->leftc;
+		}
 	}
-	else if (value < head->value)
-		insertBST(value, head->leftc);
-	else
-		insertBST(value, head->rightc);
+	if(head==NULL){
+		if(value>p->value)p->rightc=new BStree(value);
+		else p->leftc=new BStree(value);
+	}
 }
-void CreateBST(int* data,int n)
+void CreateBST(int* data, int n)
 {
 	for (int i = 0; i < n; i++) {
 		insertBST(data[i], root);
 	}
 }
-bool searchBST(int value, BStree* &head) {
-	if (head->value == value) {
-		return true;
+bool searchBST(int value, BStree* head) {
+	while (head != NULL&&value != head->value) {
+		if (value > head->value) {
+			head = head->rightc;
+		}
+		else {
+			head = head->leftc;
+		}
 	}
-	if (!head->leftc)
-		searchBST(value, head->leftc);
-	if (!head->rightc)
-		searchBST(value, head->rightc);
-	return false;
+	if (head != NULL)return true;
+	else return false;
 }
-//removeæœªå†™å®Œ
-bool removeBST(int value, BStree* &head) {
-	if (head->value == value) {
-		if (!head->leftc)head = head->leftc;
-		else if (!head->rightc)head = head->rightc;
-		else delete head;
-		return true;
+bool removeBST(int value, BStree* head) {
+	while (head != NULL&&value != head->value) {
+		if (value > head->value) {
+			head = head->rightc;
+		}
+		else {
+			head = head->leftc;
+		}
 	}
-	if (!head->leftc)
-		removeBST(value, head->leftc);
-	if (!head->rightc)
-		removeBST(value, head->rightc);
-	return false;
+	if (head == NULL)return false;
+	if (head->leftc == NULL) {
+		*head = *head->rightc;
+	}
+	else if (head->rightc == NULL) {
+		*head = *head->leftc;
+	}
+	else {	//ÕÒÇ°Çý»òºó¼Ì½áµã ÕâÀïÎÒÃÇÓÃºó¼Ì
+		BStree *tmp = head;
+		head = head->rightc;
+		BStree *p;
+		while (head->leftc != NULL) {
+			p = head;
+			head = head->leftc;
+		}
+		tmp->value = head->value;
+		p->leftc = head->rightc;
+	}
+	return true;
 }
 int main()
 {
@@ -58,8 +85,12 @@ int main()
 	root = NULL;
 	for (int i = 0; i < 15; i++)a[i] = rand() % 15;
 	CreateBST(a, 15);
-	cout <<root->value<<endl;
-	//removeBST(11,root);
-	cout << root->value;
+	cout<<searchBST(14,root)<<endl; 
+	cout<<searchBST(11,root)<<endl; 
+	cout << root->value << endl;
+	insertBST(13, root);
+	//removeBST(11, root);
+	//cout << root->rightc->leftc->value << endl << endl << endl;
+	//for (int i = 0; i < 15; i++)cout << a[i] << endl;
 	return 0;
 }
