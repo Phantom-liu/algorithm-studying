@@ -1,24 +1,20 @@
 #include<bits/stdc++.h>
 using namespace std;
 struct BStree {
-	int value = 0;
+	int value;
 	BStree* leftc;
 	BStree* rightc;
-	BStree() :leftc(NULL), rightc(NULL) {}
-	BStree(int a, BStree* left = NULL, BStree* right = NULL) {
-		value = a;
-		leftc = left;
-		rightc = right;
-	}
+	BStree(int a = 0) :value(a),leftc(nullptr), rightc(nullptr) {}
 };
-BStree*root = new BStree();
+BStree *root; 
+//二叉排序树 循环实现 
 void insertBST(int value, BStree* head) {
-	if(head==NULL){
+	if(head==nullptr){
 		root=new BStree(value);
 		return; 
 	} 
-	BStree *p=NULL;
-	while (head != NULL&&value != head->value) {
+	BStree *p=nullptr;
+	while (head != nullptr&&value != head->value) {
 		p=head;
 		if (value > head->value) {
 			head = head->rightc;
@@ -27,7 +23,7 @@ void insertBST(int value, BStree* head) {
 			head = head->leftc;
 		}
 	}
-	if(head==NULL){
+	if(head==nullptr){
 		if(value>p->value)p->rightc=new BStree(value);
 		else p->leftc=new BStree(value);
 	}
@@ -39,7 +35,7 @@ void CreateBST(int* data, int n)
 	}
 }
 bool searchBST(int value, BStree* head) {
-	while (head != NULL&&value != head->value) {
+	while (head != nullptr&&value != head->value) {
 		if (value > head->value) {
 			head = head->rightc;
 		}
@@ -47,11 +43,13 @@ bool searchBST(int value, BStree* head) {
 			head = head->leftc;
 		}
 	}
-	if (head != NULL)return true;
+	if (head != nullptr)return true;
 	else return false;
 }
 bool removeBST(int value, BStree* head) {
-	while (head != NULL&&value != head->value) {
+	BStree *tmp;
+	while (head != nullptr&&value != head->value) {
+		tmp= head;
 		if (value > head->value) {
 			head = head->rightc;
 		}
@@ -59,38 +57,57 @@ bool removeBST(int value, BStree* head) {
 			head = head->leftc;
 		}
 	}
-	if (head == NULL)return false;
-	if (head->leftc == NULL) {
-		*head = *head->rightc;
+	if (head == nullptr)return false;
+	if(head->leftc == nullptr && head->rightc == nullptr){
+		head = nullptr;
+		delete head;
 	}
-	else if (head->rightc == NULL) {
-		*head = *head->leftc;
-	}
-	else {	//找前驱或后继结点 这里我们用后继
+	else if (head->leftc == nullptr) {
 		BStree *tmp = head;
 		head = head->rightc;
+		delete tmp;
+	}
+	else if (head->rightc == nullptr) {
+		BStree *tmp = head;
+		head = head->leftc;
+		delete tmp;
+	}
+	else {	//找前驱或后继结点 这里我们用后继
+		BStree *cur = head;
+		head = head->rightc;
 		BStree *p;
-		while (head->leftc != NULL) {
+		while (head->leftc != nullptr) {
 			p = head;
 			head = head->leftc;
 		}
-		tmp->value = head->value;
+		cur->value = head->value;
+		delete p->leftc;
 		p->leftc = head->rightc;
+		head = cur;
+	}
+	//tmp为需要删除结点的父节点 head为处理好的子树根节点 
+	if (value > tmp->value) {
+		tmp->rightc = head;
+	}
+	else {
+		tmp->leftc = head;
 	}
 	return true;
 }
 int main()
 {
 	int a[16];
-	root = NULL;
-	for (int i = 0; i < 15; i++)a[i] = rand() % 15;
-	CreateBST(a, 15);
-	cout<<searchBST(14,root)<<endl; 
-	cout<<searchBST(11,root)<<endl; 
+	/* 0 -4 -8 -6 -4 0 6 14 */
+	/* 				0
+			 -4			6
+		 -8		-6	 		14
+	*/
+	for (int i = 0; i < 8; i++)a[i] = i*i-5*i;
+	CreateBST(a, 8);
+//	cout<<searchBST(14,root)<<endl;  
 	cout << root->value << endl;
-	insertBST(13, root);
+	removeBST(-4,root);
+	cout<<searchBST(-4,root)<<endl;
 	//removeBST(11, root);
-	//cout << root->rightc->leftc->value << endl << endl << endl;
-	//for (int i = 0; i < 15; i++)cout << a[i] << endl;
 	return 0;
 }

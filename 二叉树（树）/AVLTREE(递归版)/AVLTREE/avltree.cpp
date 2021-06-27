@@ -70,6 +70,11 @@ AVLTREE_NODE_PTR avltree<KEY, VALUE>::insert(AVLTREE_NODE_PTR cur, const KEY &ke
 	return cur;
 }
 template<class KEY, class VALUE>
+void avltree<KEY, VALUE>::remove(const KEY &key) {
+	root = remove(root, key);
+	return;
+}
+template<class KEY, class VALUE>
 AVLTREE_NODE_PTR avltree<KEY, VALUE>::remove(AVLTREE_NODE_PTR cur, const KEY &key) {
 	AVLTREE_NODE_PTR tmp = nullptr;
 	if (cur == nullptr) {
@@ -188,8 +193,4 @@ AVLTREE_NODE_PTR avltree<KEY, VALUE>::rotateRL(AVLTREE_NODE_PTR cur) {
 	cur->right = rotateR(cur->right);
 	return rotateL(cur);
 }
-template<class KEY, class VALUE>
-void avltree<KEY, VALUE>::remove(const KEY &key) {
-	root = remove(root, key);
-	return;
-}
+
