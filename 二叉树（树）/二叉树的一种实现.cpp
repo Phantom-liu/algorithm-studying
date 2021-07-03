@@ -6,11 +6,11 @@
 using namespace std;
 template <class T>
 struct Node {		//树的结点
-	T value;		
+	T value;
 	int level;		//结点所在层数 即高度 从0开始
 	Node<T> *left = nullptr;
 	Node<T> *right = nullptr;
-	Node(T x = 0,int l = 0) :value(x), level(l),left(nullptr), right(nullptr) {}
+	Node(T x = 0, int l = 0) :value(x), level(l), left(nullptr), right(nullptr) {}
 };
 template <class T>
 class BinaryTree {
@@ -19,14 +19,14 @@ public:
 	void inOrder() { inOrder(root); }
 	void postOrder() { postOrder(root); }
 	void levelOrder() { levelOrder(root); }
-	int getLeaves() { return leaves.size(); }
+	int getLeaves() { return leaves; }
 	int getsize() { return size; }
 	int getwide() { return wide; }
 	void clear() { clear(root); }
 	void getroad(T to) { getroad(root, to); }
 	bool insert(T d, T f = 0, int pos = 0) { return insert(root, d, f, pos); }		//数据d为数据f的孩子 0表示左孩子 1表示右孩子
-	BinaryTree() :size(0), wide(0), height(-1), root(nullptr) {}
-	~BinaryTree() {destroy(root);}
+	BinaryTree() :size(0), wide(0), height(-1), leaves(0), root(nullptr) {}
+	~BinaryTree() { destroy(root); }
 private:
 	void clear(Node<T> *head);		//将整棵树初始化为无数据的情况
 	void destroy(Node<T> *head);		//删除整颗树
@@ -40,8 +40,9 @@ private:
 	int size;		//结点个数
 	int wide;		//树的宽度（定义为树上结点最多的那一层中的结点总数）
 	int height;		//树高度 1个结点认为高度为0	（即默认减一）
+	int leaves;		//叶子
 	Node<T> *root;
-	list<Node<T>*> leaves;		//存储可能成为被插入结点的父亲结点的一个链表
+	list<Node<T>*> node_notfull;		//存储可能成为被插入结点的父亲结点的一个链表
 	vector<int> w;		//w[i]表示高度为i的结点个数
 };
 template <class T>
@@ -51,7 +52,7 @@ void BinaryTree<T>::clear(Node<T> *head) {
 	}
 	size = wide = height = 0;
 	root = nullptr;
-	leaves.clear();
+	node_notfull.clear();
 	w.clear();
 	destroy(head);
 }
@@ -97,7 +98,7 @@ void BinaryTree<T>::inOrder(Node<T> *head)
 				Node<T> *s = stack.top();
 				stack.pop();
 				cout << s->value << "  ";
-				head = s->left;
+				head = s->right;
 			}
 		}
 	}
@@ -226,26 +227,30 @@ template<class T>
 bool BinaryTree<T>::insert(Node<T> *head, T d, T f, int pos) {
 	if (head == nullptr) {
 		root = new Node<T>(d, 0);
-		leaves.push_back(root);
+		node_notfull.push_back(root);
 		size++;
 		height++;
 		w.push_back(0);
 		w[height]++;
 		wide = max(wide, w[height]);
+		leaves++;
 		return true;
 	}
-	for (Node<T>* z : leaves) {
+	for (Node<T>* z : node_notfull) {
 		if (z->value == f) {
 			if (pos == 0) {
 				z->left = new Node<T>(d, z->level + 1);
-				leaves.push_back(z->left);
+				node_notfull.push_back(z->left);
 			}
 			else {
 				z->right = new Node<T>(d, z->level + 1);
-				leaves.push_back(z->right);
+				node_notfull.push_back(z->right);
 			}
 			if (z->left&&z->right) {
-				leaves.remove(z);
+				node_notfull.remove(z);
+			}
+			else {
+				leaves++;
 			}
 			size++;
 			if (z->level == height) {
@@ -327,6 +332,7 @@ void getWideAndLeaves() {
 }
 void getThePath() {
 	int to;
+	cout << "输入目标结点的值" << endl;
 	cin >> to;
 	lzz.getroad(to);
 }

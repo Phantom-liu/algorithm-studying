@@ -88,7 +88,7 @@ AVLTREE_NODE_PTR avltree<KEY, VALUE>::remove(AVLTREE_NODE_PTR cur, const KEY &ke
 	}
 	else if (cur->left&&cur->right) {
 		tmp = find_min(cur->right);
-		cur.key = tmp->key;
+		cur->key = tmp->key;
 		cur->value = tmp->value;
 		cur->right = remove(cur->right, cur->key);
 	}
